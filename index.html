@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PA State Legislature Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet core CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+  <!-- Sidebar plugin CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.min.css"
+  />
+
+  <!-- Geocoder plugin CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+  />
+
+  <!-- Your custom styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* Full‐page map reset */
+    html, body, #map { height: 100%; margin: 0; padding: 0; }
+
+    /* Fix sidebar tab visibility - make them wider and more visible */
+    .leaflet-sidebar-tabs {
+      width: 60px !important; /* Increase from default */
+    }
+
+    /* Style the sidebar tabs so they're obvious and fully visible */
+    .leaflet-sidebar-tabs a {
+      background: #0055a5 !important;
+      color: white !important;
+      padding: 12px 8px !important;
+      display: block !important;
+      text-align: center !important;
+      font-weight: bold !important;
+      border-bottom: 1px solid #004080 !important;
+      font-size: 11px !important;
+      line-height: 1.1 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    
+    .leaflet-sidebar-tabs a:hover,
+    .leaflet-sidebar-tabs .leaflet-sidebar-tab-active {
+      background: #003d7a !important;
+    }
+
+    /* Ensure sidebar content has proper width */
+    .leaflet-sidebar-content {
+      width: 320px !important;
+    }
+
+    /* Style the lists in sidebar */
+    #senate-list, #house-list {
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+    }
+
+    #senate-list ul, #house-list ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    #senate-list li, #house-list li {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #senate-list li:hover, #house-list li:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Simple icon styling for tabs without FontAwesome dependency */
+    .tab-icon {
+      font-size: 16px;
+      margin-bottom: 2px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar container -->
+  <div id="sidebar" class="leaflet-sidebar collapsed">
+    <div class="leaflet-sidebar-tabs">
+      <ul role="tablist">
+        <li><a href="#senate" role="tab"><span class="tab-icon">🏛️</span> Senate</a></li>
+        <li><a href="#house"  role="tab"><span class="tab-icon">🏢</span> House</a></li>
+      </ul>
+    </div>
+    <div class="leaflet-sidebar-content">
+      <!-- Senators pane -->
+      <div id="senate" class="leaflet-sidebar-pane">
+        <h1 class="leaflet-sidebar-header">
+          Senate Districts
+          <span class="leaflet-sidebar-close">✕</span>
+        </h1>
+        <div id="senate-list" style="overflow-y:auto; max-height:calc(100% - 50px)"></div>
+      </div>
+      <!-- Representatives pane -->
+      <div id="house" class="leaflet-sidebar-pane">
+        <h1 class="leaflet-sidebar-header">
+          House Districts
+          <span class="leaflet-sidebar-close">✕</span>
+        </h1>
+        <div id="house-list" style="overflow-y:auto; max-height:calc(100% - 50px)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map container -->
+  <div id="map"></div>
+
+  <!-- Leaflet core JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Sidebar plugin JS -->
+  <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.min.js"></script>
+
+  <!-- Geocoder plugin JS -->
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+  <!-- Your map logic -->
+  <script src="js/map.js"></script>
+</body>
+</html>
