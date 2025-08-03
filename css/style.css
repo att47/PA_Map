@@ -1,0 +1,69 @@
+/* District number labels - JUST NUMBERS, centered and more visible */
+.district-label {
+  text-align: center;
+}
+
+.district-label span {
+  background: rgba(255,255,255,0.9);
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #333;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Enhanced sidebar tab buttons for better visibility */
+.leaflet-sidebar-tabs a {
+background: #0055a5 !important;
+color: white !important;
+padding: 12px 8px !important;
+display: block !important;
+text-align: center !important;
+font-weight: bold !important;
+border-bottom: 1px solid #004080 !important;
+font-size: 11px !important;
+line-height: 1.1 !important;
+width: 100% !important;
+box-sizing: border-box !important;
+}
+
+/* Hover and active state */
+.leaflet-sidebar-tabs a:hover,
+.leaflet-sidebar-tabs .leaflet-sidebar-tab-active a {
+background: #003d7a !important;
+}
+
+/* Ensure sidebar tabs are wide enough to show full text */
+.leaflet-sidebar-tabs {
+width: 60px !important;
+}
+
+/* Style the lists for better organization */
+#senate-list ul, #house-list ul {
+margin: 0;
+padding: 0;
+list-style: none;
+}
+
+#senate-list li, #house-list li {
+padding: 8px 12px;
+border-bottom: 1px solid #eee;
+cursor: pointer;
+font-size: 14px;
+transition: background-color 0.2s ease;
+}
+
+#senate-list li:hover, #house-list li:hover {
+background-color: #f0f0f0;
+}
+
+/* Scrollbar styling for the lists */
+#senate-list, #house-list {
+overflow-y: auto;
+max-height: calc(100vh - 120px);
+}
