@@ -280,7 +280,46 @@ let highlightedSenate = null;
 let highlightedHouse  = null;
 let searchMarker = null; // Track the search marker
 
-// 6. Style by party (handles both chambers)
+// 6. Function to load representative info in iframe
+function loadRepresentativeInfo(name, district, chamber, url) {
+  const iframe = document.getElementById('rep-iframe');
+  const loading = document.getElementById('iframe-loading');
+  const repNameElement = document.getElementById('rep-name');
+  
+  // Update header
+  const title = chamber === 'Senate' ? 'Senator' : 'Representative';
+  repNameElement.textContent = `${title} ${name} (District ${district})`;
+  
+  // Show loading and hide iframe
+  loading.style.display = 'flex';
+  iframe.style.display = 'none';
+  
+  // Load the URL in iframe
+  iframe.src = url;
+  
+  // Handle iframe load
+  iframe.onload = function() {
+    loading.style.display = 'none';
+    iframe.style.display = 'block';
+  };
+  
+  // Handle iframe error
+  iframe.onerror = function() {
+    loading.innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <p>Unable to load representative page.</p>
+        <a href="${url}" target="_blank" style="color: #0055a5; text-decoration: none;">
+          Open in new tab →
+        </a>
+      </div>
+    `;
+  };
+  
+  // Open the info sidebar
+  sidebar.open('rep-info');
+}
+
+// 7. Style by party (handles both chambers)
 function styleByParty(feature) {
   const props = feature.properties;
   const party =
@@ -295,11 +334,11 @@ function styleByParty(feature) {
   };
 }
 
-// 7. Prepare layer‐groups for labels
+// 8. Prepare layer‐groups for labels
 const senateLabels = L.layerGroup();
 const houseLabels  = L.layerGroup();
 
-// 8. Load Senate districts
+// 9. Load Senate districts
 let senateLayer, houseLayer;
 let baseLayers; // Define baseLayers globally
 
@@ -315,7 +354,7 @@ fetch('Senate_Districts.geojson')
     populateList(senData.features, 'senate-list', 'Senate');
   });
 
-// 9. Load House districts
+// 10. Load House districts
 fetch('House_Districts.geojson')
   .then(r => r.json())
   .then(houseData => {
@@ -327,7 +366,7 @@ fetch('House_Districts.geojson')
     addLabels(houseLayer, houseLabels, 'House');
     populateHouseList(houseData.features);
 
-    // 10. Layer control (mutually exclusive) - COMBINED
+    // 11. Layer control (mutually exclusive) - COMBINED
     baseLayers = {
       "Senate Districts": L.layerGroup([senateLayer, senateLabels]),
       "House Districts":  L.layerGroup([houseLayer,  houseLabels ])
@@ -381,7 +420,7 @@ fetch('House_Districts.geojson')
     baseLayers["Senate Districts"].addTo(map);
   });
 
-// 11. Helper: drop district labels into the given label group (CENTERED)
+// 12. Helper: drop district labels into the given label group (CENTERED)
 function addLabels(polyLayer, labelGroup, prefix) {
   polyLayer.eachLayer(layer => {
     const props = layer.feature.properties;
@@ -423,6 +462,25 @@ function formatName(name) {
     .join(' ');
 }
 
+// Helper function to get representative name with fallbacks for missing data
+function getRepresentativeName(properties, district) {
+  let name = properties["2025_House_Members_NAME"];
+  
+  // Handle specific cases where names might be missing in the data
+  if (!name || name.trim() === '') {
+    switch(parseInt(district)) {
+      case 174:
+        return 'Ed Neilson';
+      case 200:
+        return 'Christopher M. Rabb';
+      default:
+        return 'Name Not Available';
+    }
+  }
+  
+  return formatName(name);
+}
+
 // Helper function to clear search marker
 function clearSearchMarker() {
   if (searchMarker) {
@@ -431,7 +489,7 @@ function clearSearchMarker() {
   }
 }
 
-// 12. Populate Senate sidebar list (SORTED BY DISTRICT NUMBER) - UPDATED FORMAT
+// 13. Populate Senate sidebar list (SORTED BY DISTRICT NUMBER) - UPDATED FORMAT
 function populateList(features, containerId, prefix) {
   // Sort features by district number in ASCENDING order
   const sortedFeatures = features.sort((a, b) => {
@@ -477,7 +535,7 @@ function populateList(features, containerId, prefix) {
   container.appendChild(ul);
 }
 
-// 13. Populate House sidebar list (SORTED BY DISTRICT NUMBER) - UPDATED FORMAT
+// 14. Populate House sidebar list (SORTED BY DISTRICT NUMBER) - UPDATED FORMAT
 function populateHouseList(features) {
   // Sort features by district number in ASCENDING order
   const sortedFeatures = features.sort((a, b) => {
@@ -493,7 +551,7 @@ function populateHouseList(features) {
   
   sortedFeatures.forEach(f => {
     const p = f.properties;
-    const name     = formatName(p["2025_House_Members_NAME"]);
+    const name = getRepresentativeName(p, p.distr_num);  // Use the helper function
     const district = p.distr_num;
     const li = document.createElement('li');
     li.textContent = `District ${district}: Representative ${name}`;
@@ -556,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 1000);
 });
 
-// 14. Senate popup + highlight (UPDATED WITH OFFICIAL LINKS)
+// 15. Senate popup + highlight + iframe loading (UPDATED WITH IFRAME FUNCTIONALITY)
 function onEachSenate(feature, layer) {
   const p = feature.properties;
   const num      = parseInt(p.sldust, 10);
@@ -572,7 +630,7 @@ function onEachSenate(feature, layer) {
     Party: ${party}<br/>
     District: ${num}<br/>
     Counties: ${counties}<br/>
-    <button onclick="window.open('${officialUrl}','_blank')">More…</button>
+    <button onclick="window.open('${officialUrl}','_blank')" style="background: #0055a5; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 8px;">View Full Profile</button>
   `);
 
   layer.on('click', () => {
@@ -580,14 +638,17 @@ function onEachSenate(feature, layer) {
     layer.setStyle({ fillColor: 'yellow', fillOpacity: 0.5 });
     highlightedSenate = layer;
     layer.openPopup();
+    
+    // Auto-load in iframe
+    loadRepresentativeInfo(name, num, 'Senate', officialUrl);
   });
 }
 
-// 15. House popup + highlight (UPDATED WITH OFFICIAL LINKS)
+// 16. House popup + highlight + iframe loading (UPDATED WITH IFRAME FUNCTIONALITY)
 function onEachHouse(feature, layer) {
   const p = feature.properties;
   const num      = p.distr_num;
-  const name     = formatName(p["2025_House_Members_NAME"]);
+  const name     = getRepresentativeName(p, num);  // Use the helper function
   const party    = p["2025_House_Members_PARTY"];
   const counties = p["2025_House_Members_COUNTIES"];
   
@@ -599,7 +660,7 @@ function onEachHouse(feature, layer) {
     Party: ${party}<br/>
     District: ${num}<br/>
     Counties: ${counties}<br/>
-    <button onclick="window.open('${officialUrl}','_blank')">More…</button>
+    <button onclick="window.open('${officialUrl}','_blank')" style="background: #0055a5; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 8px;">View Full Profile</button>
   `);
 
   layer.on('click', () => {
@@ -607,13 +668,16 @@ function onEachHouse(feature, layer) {
     layer.setStyle({ fillColor: 'yellow', fillOpacity: 0.5 });
     highlightedHouse = layer;
     layer.openPopup();
+    
+    // Auto-load in iframe
+    loadRepresentativeInfo(name, num, 'House', officialUrl);
   });
 }
 
-// 16. Address search with improved functionality
+// 17. Address search with improved functionality
 L.Control.geocoder({ 
   defaultMarkGeocode: false,
-  placeholder: 'Search address...',
+  placeholder: 'Search Address',
   errorMessage: 'Address not found'
 })
   .on('markgeocode', e => {
@@ -633,6 +697,29 @@ L.Control.geocoder({
   })
   .addTo(map);
 
+// Enhance search bar visibility
+setTimeout(() => {
+  const searchInput = document.querySelector('.leaflet-control-geocoder-form input');
+  if (searchInput) {
+    // Make placeholder more visible
+    searchInput.style.color = '#333';
+    searchInput.style.fontWeight = 'normal';
+    
+    // Add event listeners to maintain placeholder visibility
+    searchInput.addEventListener('focus', function() {
+      if (this.value === '') {
+        this.style.color = '#333';
+      }
+    });
+    
+    searchInput.addEventListener('blur', function() {
+      if (this.value === '') {
+        this.style.color = '#666';
+      }
+    });
+  }
+}, 1000);
+
 // Clear search marker when clicking elsewhere on map
 map.on('click', (e) => {
   // Only clear if not clicking on a feature
@@ -642,3 +729,6 @@ map.on('click', (e) => {
     }
   }, 100);
 });
+
+// Make loadRepresentativeInfo globally available for popup buttons
+window.loadRepresentativeInfo = loadRepresentativeInfo;
