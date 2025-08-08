@@ -55,9 +55,9 @@
       background: #003d7a !important;
     }
 
-    /* Ensure sidebar content has proper width */
+    /* Ensure sidebar content has proper width - increased for iframe */
     .leaflet-sidebar-content {
-      width: 320px !important;
+      width: 400px !important;
     }
 
     /* Style the lists in sidebar */
@@ -89,6 +89,19 @@
       margin-bottom: 2px;
       display: block;
     }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+      .leaflet-sidebar-content {
+        width: 300px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .leaflet-sidebar-content {
+        width: 280px !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -98,6 +111,7 @@
       <ul role="tablist">
         <li><a href="#senate" role="tab"><span class="tab-icon">🏛️</span> Senate</a></li>
         <li><a href="#house"  role="tab"><span class="tab-icon">🏢</span> House</a></li>
+        <li><a href="#rep-info" role="tab"><span class="tab-icon">👤</span> Info</a></li>
       </ul>
     </div>
     <div class="leaflet-sidebar-content">
@@ -109,6 +123,7 @@
         </h1>
         <div id="senate-list" style="overflow-y:auto; max-height:calc(100% - 50px)"></div>
       </div>
+      
       <!-- Representatives pane -->
       <div id="house" class="leaflet-sidebar-pane">
         <h1 class="leaflet-sidebar-header">
@@ -116,6 +131,20 @@
           <span class="leaflet-sidebar-close">✕</span>
         </h1>
         <div id="house-list" style="overflow-y:auto; max-height:calc(100% - 50px)"></div>
+      </div>
+
+      <!-- Representative Info pane with iframe -->
+      <div id="rep-info" class="leaflet-sidebar-pane">
+        <h1 class="leaflet-sidebar-header">
+          <span id="rep-name">Representative Info</span>
+          <span class="leaflet-sidebar-close">✕</span>
+        </h1>
+        <div class="rep-iframe-container">
+          <div id="iframe-loading" class="iframe-loading">
+            Loading representative information...
+          </div>
+          <iframe id="rep-iframe" style="display: none;"></iframe>
+        </div>
       </div>
     </div>
   </div>
