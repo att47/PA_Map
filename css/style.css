@@ -67,3 +67,47 @@ background-color: #f0f0f0;
 overflow-y: auto;
 max-height: calc(100vh - 120px);
 }
+
+/* NEW: Style the iframe container and loading state */
+#rep-info {
+  padding: 0;
+}
+
+#rep-info .leaflet-sidebar-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 15px 20px;
+  margin: 0;
+}
+
+#rep-info .rep-iframe-container {
+  height: calc(100vh - 80px);
+  width: 100%;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+#rep-info iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Loading state for iframe */
+.iframe-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Mobile responsive adjustments for iframe */
+@media (max-width: 768px) {
+  #rep-info .leaflet-sidebar-header {
+    padding: 10px 15px;
+    font-size: 16px;
+  }
+}
